@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="../jknotify.js"></script>
+    <script src="../jknotifyui.js"></script>
+    <style>
+      body { font-family: sans-serif; padding: 2em; font-size: 90%;}
+      h1 { text-align: center; }      
+      td, th { border-bottom: 1px solid #ccc; }
+      table td { padding: 0.25em 1em; font-size: smaller;}
+      table td span { display: block; }
+    </style>  
+    <script>
+    // Now let's cover some code for a password prompt
+ $(document).ready(function() {
+  $('a#simple').click(function() {
+    $.jKnotify('Simple message.');
+    return false;
+  });
+  
+  $('a#icons').click(function() {
+    $.jKnotify('Message with heading', {title: 'Title!'});
+    $.jKnotify('Message with icon', {icon: 'documentinfo.png'});
+    $.jKnotify('Message with icon and title', {icon: 'documentinfo.png', title:'Title!'});
+    return false;
+   });
+  
+  $('a#notitle').click(function() {
+    $.jKnotify('There is no title bar here', {titleBar: false});
+    return false;
+  });
+   
+  $('a#unpassive').click(function() {
+    $.jKnotify('This won\'t go away when you click on it. You have to press the X', {passive: false});
+    return false;
+  });
+  
+  $('a#timeout').click(function() {
+    $.jKnotify('This has a timeout of two seconds', {timeout: 2000});
+    return false;
+  });
+  
+  
+  // Simple UI example.
+  $('a#ui').click(function() { 
+    var submit = $('<input type="button" value="Okay">').click(function() {
+                      $.jKnotify('Hello, ' + 
+                        $('input[type=text]', $(this).parent()).val() + '!');
+                     });
+    $html = $('<p>').html('please enter your name<br>')
+                    .append($('<input type=\'text\'>'))
+                    .append(submit)
+                    .append($('<input type=button value=Cancel>'))
+    $.jKnotify($html, {passive: false});
+    return false;
+  });
+  
+  
+  // complex ui example where we handle the close events ourselves.
+  $('a#cui').click(function() { 
+    var $notification = null, // this is our handler to the notification, which 
+        // we need as we're going to call close on it.
+        close = function(text) { 
+          if (text) 
+            $.jKnotify('Hello, ' + text, {passive:false})
+          $n.jKnotifyClose(); // close event
+        },
+        text = 'Please enter your name',
+        inp = $('<input type="text">').keyup(function(e) { 
+                if (e.keyCode == 13) // enter key.
+                  close($(this).val());
+                }),                
+        ok = $('<input type="button" value="Okay">').click(function() { 
+          close(inp.val());
+        }),
+        cancel = $('<input type="button" value="Cancel">').click(function() {
+          close();
+        }),
+        reset = $('<input type="button" value="Reset">').click(function() {
+          inp.val('');
+        }),
+        msg;
+    msg = $('<p>').html(text).append(inp).append($('<p>').append(ok).append(cancel).append(reset));
+    // we get the handle here.
+    $n = $.jKnotify(msg, {passive: false, closeOnButtonClick: false});
+    return false;
+  });
+
+  $('a#collapse').click(function() {
+
+    for (var i=0; i<3; i++) {
+      $.jKnotify('This message will collapse after two seconds. Mouse over it to  see it again',  { 
+        collapse: 2000,
+        passive: false,
+        title: 'Collapsing Messages After Inactivity',
+        icon: 'system-help.png'
+      });
+    }
+    return false;
+  }) 
+
+
+  // long message
+  $('a#long').click(function() {
+    var msg = '<div style="background-image: url(longcat.jpg); background-repeat: repeat-y">';
+    msg += 'Longcat is<br>l<br>';
+    for (var i=0; i<100; i++) {
+      msg += 'o<br>';
+    }
+    msg += 'n<br>g<br></div>';
+    $.jKnotify((msg));
+    return false;
+  });
+  
+  /************************************************************
+  *************************************************************
+  jKnotifyUI Examples start 
+  ************************************************************/
+  
+  
+  
+    // Yes/No buttons trigger a callback with a boolean argument
+    $('#yesno').click(function() {
+      var $n = $.jKnotifyUi();
+      $n.jK.title('Yes or no!').jK.button('Yes!', 'yes').jK.button('No!', 'no')
+        .jK.callback(function(v) {
+          $.jKnotify('You pressed ' + v.toString());
+        }).jK.finish();    
+      return false;
+    });
+  
+    // Cancel buttons suppress the callback from firing.
+    $('#yesnocancel').click(function() {
+        var $n = $.jKnotifyUi();
+        $n.jK.title('Yes or no!').jK.button('Yes!', 'yes').jK.button('No!', 'no')
+          .jK.button('Cancel', 'cancel').jK.callback(function(v) {
+            $.jKnotify('You pressed ' + v.toString());
+          }).jK.finish();    
+        return false;
+    });
+    
+    // This is a more complete example using two text input boxes.
+    // The submit button triggers a callback which receives a map of 
+    // values, keyed by the names which are provided in the textInput 
+    // call (second arg).
+    $('#text').click(function() {
+      var $n = $.jKnotifyUi();
+      $n.jK.icon('object-locked.png')
+        .jK.title('Please enter your password to unlock the secrets!')
+        .jK.text('Don\'t worry - these don\'t actually do anything')
+        .jK.textInput('Username', 'username')
+        .jK.textInput('Password', 'password', {password:true})
+        .jK.button('Okay', 'submit')
+        .jK.callback(function(vars) {
+          $.jKnotify('Hello, ' + vars.username + ', your password was ' + 
+            vars.password.length + ' characters long');
+         })
+        .jK.finish();
+        
+      return false;
+    });
+    
+    
+    $('#eg').click(function() {
+      $.jKnotifyUi().jK.title('Please enter your password')
+                .jK.icon('object-locked.png')
+                .jK.textInput('Username:', 'u')  // 2nd arg is the name. We use this in the callback
+                .jK.textInput('Password:', 'p', {password:true})
+                .jK.button('Open Sesame', 'submit') // 2nd arg is the type.
+                .jK.button('Oops, let me do that again', 'reset')
+                .jK.callback(function(args) {
+                  var password = args.p,
+                      username = args.u;
+                  if (username == 'Barry' && password == 'chuckle123') {
+                    $.jKnotify('yes!');
+                  } else { 
+                    $.jKnotify('sorry!');
+                  }
+                })                
+                .jK.finish();
+    return false;
+    });
+    
+    $('#checkbox').click(function() {
+      $.jKnotifyUi().jK.toggleInput('I like chips', 'chips', true)
+                    .jK.button('Submit', 'submit')
+                    .jK.button('Wait, I made a mistake', 'reset')
+                    .jK.callback(function(args) {
+                      if (args.chips) 
+                        $.jKnotify('Yes you do!');
+                      else 
+                        $.jKnotify('But everyone likes chips!');
+                      })
+                      .jK.finish();
+      return false;
+    });
+    
+    
+    $('#select').click(function() {
+      $.jKnotifyUi().jK.selectInput('Today is', 'today', {
+          mon: 'Monday',
+          tue: 'Tuesday',
+          wed: 'Wednesday',
+          thu: 'Thursday',
+          fri: 'Friday',
+          sat: 'Saturday',
+          sun: 'Sunday'
+      }, 'wed') // I will be right 1/7th of the time!
+      .jK.button('Submit', 'submit')
+      .jK.button('Wait, I made a mistake', 'reset')
+      .jK.callback(function(args) {
+          $.jKnotify('You pressed ' + args.today + '. You might be right.');
+        })
+      .jK.finish();
+    return false;
+    });
+
+    $('#form').click(function() {
+      $.jKnotifyUi().jK.form('post', 'post.php')
+        .jK.textInput('Please enter your name', 'name')
+        .jK.button('Submit', 'submit')
+        .jK.finish();
+      return false;
+    });
+  
+
+  });
+  
+    </script>
+    <link rel='stylesheet' type='text/css' href='../jknotify.css'>
+  </head>
+  
+  <body>
+  
+  
+  <h1>jKnotify</h1>
+  <p>jKnotify is a JavaScript notification library based on KDE4's Knotify. It display 
+  unintrusive notifications in the corner of the screen instead of using old-school
+  alert() style functionality, or the only slightly less annoying lightbox
+  functionality. It can easily handle input, too, and comes with an extension
+  (jKnotifyUi) to help build simple user interfaces.
+  <p> See the bottom of the page for a demo </p>
+  
+  <p>Usage is simple: <code>$.jKnotify('hello!', options)</code> </p>
+  
+  <h2>Options:</h2>
+  <p> Options is, as usual, a map of optionName : value.
+  <table>
+    <thead>
+      <th> Option </th> <th>Default</th> <th> Description </th> 
+    </thead>
+    <tr>
+      <td> closable(bool) </td><td> true </td>
+      <td>Specifies whether or not the notification should have the 'x' button.</td>
+    </tr>
+    <tr>
+      <td>closeOnButtonClick(bool) </td><td>  true</td>
+      <td>If true, the notification will be closed if any input button
+        is clicked within the message property. This allows a fairly simple way to 
+        deal with user input
+      </td>
+    </tr>
+    <tr>
+      <td> collapse(int) </td><td>  false </td>
+      <td> A timer (ms) before the notification is collapsed and only the title bar is visible. </td>
+    </tr>
+    <tr>
+      <td> icon(string)</td><td>  false  </td>
+      <td> URL to an icon to display in the title bar.</td>
+    </tr>  
+    <tr>
+      <td>passive(bool)</td><td>  true</td>
+      <td>If true, the notification will close when the user clicks it. </td>
+    </tr>
+    <tr>
+      <td> timeout(int) </td><td>  false </td>
+      <td> A timeout before the notification self-closes. </td>
+    </tr>
+    <tr>
+      <td> title(string) </td><td>  false </td>
+      <td> A title to display in the title bar. </td>
+    </tr>
+    <tr>
+      <td> titleBar(bool) </td><td>  true </td>
+      <td> Whether or not to display a title bar. Note that if you don't 
+      display this, the 'x' close-clicker will not be displayed, so you 
+      must make sure there's another way to close the notification. </td>
+    </tr>
+  </table>
+  
+  <h2>jKnotifyUI</h2>
+  <p>jKnotifyUI is a wrapper around jKnotify that basically acts as a form builder. 
+    The procedure is something like this:
+    <pre>$.jKnotifyUi().jK.toggleInput('I like chips', 'chips', true)
+  .jK.button('Submit', 'submit')
+  .jK.button('Wait, I made a mistake', 'reset')
+  .jK.callback(function(args) {
+  if (args.chips) 
+    $.jKnotify('Yes you do!');
+  else 
+    $.jKnotify('But everyone likes chips!');
+  })
+  .jK.finish();</pre>
+  <p>From the above, you can see that <code>$.jKnotifyUi()</code> returns an object
+    which has a set of form building functions on it, which you then call
+    before finally calling .jK.finish() to create the notification.
+  </p>
+  <table>
+    <thead>
+      <th>Function</th><th>Arguments</th> <th>Description</th>
+    </thead>
+    <tr>
+      <td>jK.button</td><td><span>text(string)</span><span>type(string)</span></td>
+      <td>Adds a button to the body with the given text. Valid types are: 'yes', 'no' 
+        (triggers boolean argument to callback and closes notification), 
+        'submit' (map argument to callback, closes notification), 'cancel' 
+        (closes notification without firing callback) and 'reset' 
+        (resets input elements to default).
+      </td>
+    </tr>
+    <tr>
+      <td>jK.callback</td><td><span>func(function)</span></td>
+      <td>Sets the callback function. What this receives depends on what 
+        input element is clicked. A yes/no box triggers a boolean argument. 
+        A submit button triggers a map of properties which are keyed by the
+        names supplied to $.jk.textInput().
+      </td>
+    </tr>
+    <tr>
+      <td>jK.closable</td><td><span>closable(bool)</span></td>
+      <td>Sets whether or not the notification should be closable, i.e. whether or not there's an 'x' for the user to click. Generally you'll want this to be false as you don't want the request for input to be lost.
+      </td>
+    </tr>
+    <tr>
+      <td>jK.form</td><td><span>method(string)</span><span>action(string)</span></td>
+      <td>Creates a real HTML form which if coupled with a submit button will really submit.
+      </td>
+    </tr>
+    <tr>
+      <td>jK.icon</td><td><span>url(string)</span></td>
+      <td>Sets an icon (in the title bar) </td>
+    </tr>
+    <tr>
+      <td>jK.selectInput</td>
+      <td>
+        <span>text(string)</span>
+        <span>name(string)</span>
+        <span>selections(map)</span>
+        <span>default(string)</span>
+      </td>
+      <td>Adds a select box to your notification with the given text, name, selections and default value. 
+        The selections are given as a map of name: text. They are inserted in the order given.
+      </td>
+    </tr>
+    <tr>
+      <td>jK.text</td><td><span>text(string)</span></td>
+      <td>Adds some text to the body
+      </td>
+    </tr>
+    <tr>
+      <td>jK.textInput</td>
+      <td>
+        <span>text(string)</span>
+        <span>name(string)</span>
+        <span>options(map)</span>
+      </td>
+      <td>Adds a text input box. This has a visible label of 'text' and it is referred to in the callback's
+       arguments as 'name'. Valid options (and defaults) are: {closeOnEnter: true, password: false, default: ''}.
+      </td>
+    </tr>
+    <tr>
+      <td>jK.title</td><td><span>title(string)</span></td>
+      <td>Sets a title</td>
+    </tr>
+    <tr>
+      <td>jK.toggleInput</td><td><span>text (string)</span> <span>name (string)</span> <span>checked(bool)</span></td>
+      <td>Adds a toggle (checkbox) input with the given label (text), name, 
+        and sets whether it is checked by default or not.
+      </td>
+    </tr>
+  </table>
+                    
+              
+  
+  
+  
+  <h2> Demo </h2>
+  <p> Look at the source to see exactly how each of these is constructed. Really! </p>
+  <ul> 
+  <li> <a href='#' id='simple'>Simple</a> </li>
+  <li> <a href='#' id='icons'>Icons and headings</a> </li>
+  <li> <a href='#' id='notitle'>No title bar</a> </li>
+  <li> <a href='#' id='unpassive'>Unpassive</a> </li>
+  <li> <a href='#' id='timeout'>Timeout</a> </li>
+  <li> <a href='#' id='ui'>Simple UI example</a>. The notification will automatically close if an input button is clicked.</li>
+  <li> <a href='#' id='cui'>Complex UI example</a>. The notification will NOT automatically close if an input button is clicked, the close is handled by the caller.</li>
+  <li> <a href='#' id='collapse'>Collapsing messages</a> </li>
+  <li> <a href='#' id='long'>Long message</a></li>
+</ul>
+  <h3> jKnotifyUI demo </h3>
+  <ul>
+  <li><a href='#' id='yesno'>Boolean input</a></li>
+  <li><a href='#' id='yesnocancel'>Boolean input with cancel</a></li>
+  <li><a href='#' id='text'>Text Fields</a></li>
+  <li><a href='#' id='eg'>Example</a></li>
+  <li><a href='#' id='checkbox'>Checkbox</a></li>
+  <li><a href='#' id='select'>Selector</a></li>
+  <li><a href='#' id='form'>A real form with post submission</a>
+  </ul>
+
+</div>
+  </body>
+
+</html>
