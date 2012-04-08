@@ -5,15 +5,37 @@
     <script src="../jknotify.js"></script>
     <script src="../jknotifyui.js"></script>
     <style>
-      body { font-family: sans-serif; padding: 2em; font-size: 90%;}
+      body { font-family: sans-serif; padding: 2em;}
       h1 { text-align: center; }      
       td, th { border-bottom: 1px solid #ccc; }
       table td { padding: 0.25em 1em; font-size: smaller;}
       table td span { display: block; }
     </style>  
     <script>
-    // Now let's cover some code for a password prompt
  $(document).ready(function() {
+ 
+  
+  // here's a quick example of showing some formatted text.
+  var $message = $('<div>').html(
+    '<p>Welcome to jKnotify. Jump to:</p>' +
+    '<ul>' + 
+      '<li><a href=#jknotifyui>jKnotifyUI</a></li>' +
+      '<li><a href=#demo>A demo</a></li>' +
+    '</ul>'
+  );
+  
+  // we can also cause the 'a' links to cause the notification to 
+  // collapse by catching the click event and finding the
+  // notification and calling its close function
+  $message.find('a').click(function() {
+    $(this).parents('.notification').jKnotifyClose();
+  })
+  $.jKnotify($message, {title:'Hello!', passive: false});
+ 
+ 
+ 
+  // following are the demo handlers.
+ 
   $('a#simple').click(function() {
     $.jKnotify('Simple message.');
     return false;
@@ -242,6 +264,14 @@
   (jKnotifyUi) to help build simple user interfaces.
   <p> See the bottom of the page for a demo </p>
   
+  <h2> Download </h2>
+  <a href='https://github.com/markwatkinson/jKnotify'>GitHub</a>, or if you're lazy grab these 3 files:
+  <a href='../jknotify.js'>jknotify.js</a>, <a href='../jknotifyui.js'>jknotifyui.js</a> and
+  <a href='../jknotify.css'>jknotify.css</a>.
+
+  
+  <h2> Usage and stuff </h2> 
+  
   <p>Usage is simple: <code>$.jKnotify('hello!', options)</code> </p>
   
   <h2>Options:</h2>
@@ -289,7 +319,7 @@
     </tr>
   </table>
   
-  <h2>jKnotifyUI</h2>
+  <h2 id='jknotifyui'>jKnotifyUI</h2>
   <p>jKnotifyUI is a wrapper around jKnotify that basically acts as a form builder. 
     The procedure is something like this:
     <pre>$.jKnotifyUi().jK.toggleInput('I like chips', 'chips', true)
@@ -385,7 +415,7 @@
   
   
   
-  <h2> Demo </h2>
+  <h2 id='demo'> Demo </h2>
   <p> Look at the source to see exactly how each of these is constructed. Really! </p>
   <ul> 
   <li> <a href='#' id='simple'>Simple</a> </li>

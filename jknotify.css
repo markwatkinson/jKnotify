@@ -11,6 +11,10 @@
   font-size: smaller;
 }
 
+.notification-area a {
+  color: white;
+  text-decoration: underline;
+}
 
 .notification-area .notification {
   padding: 6px;
@@ -19,19 +23,16 @@
   border-right-width: 2px;
   background-color: #555;
   background-color: rgba(0, 0, 0, 0.7);
-  
 }
 
 .notification-area .title-bar {
   background-color: #000;
   background-color: rgba(0, 0, 0, 0.9);
   
-  padding-right:15px; /* for the 'x' */
-  padding-top: 2px;
-  padding-left: 2px;
+  padding: 2px 15px 2px 4px; /* 15 for the 'x' */
   height:auto!important;
-  height: 20px;
-  min-height:20px;
+  height: 17px;
+  min-height:17px;
   position: relative;
   font-weight: bold;
 }
@@ -45,7 +46,7 @@
   /* 'x' in the corner */
 .notification-area .title-bar .closer {
   display: block;
-  top: 3px;
+  top: 1px;
   right: 2px;
   position: absolute;
   width: 10px;
